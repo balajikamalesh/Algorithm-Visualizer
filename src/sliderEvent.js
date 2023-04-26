@@ -33,6 +33,8 @@ function generateBlocks(num = 45) {
     }
 
     x.sort(() => Math.random() - 0.5); //shuffle array
+  
+    let fragment = document.createDocumentFragment()
 
     for (let i = 0; i < num-1; i += 1) {
       
@@ -70,6 +72,7 @@ function generateBlocks(num = 45) {
         blockLabel.innerHTML = value;
   
       block.appendChild(blockLabel);
-      container.appendChild(block);
+      fragment.append(block);
     }
+    container.append(fragment);
   }
