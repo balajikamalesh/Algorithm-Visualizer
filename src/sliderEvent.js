@@ -1,78 +1,69 @@
-var slider = document.getElementById("changeSize");
-const container = document.querySelector(".data-container");
-var x = [];
+const slider = document.getElementById("changeSize");
+const container = document.getElementById("data-container");
+const warningContainer = document.getElementById("warning");
+const resultContainer = document.querySelector("#result");
 
-generateBlocks(Number(slider.value));
+let dataset = [];
 
-slider.oninput = function() {
-  generateBlockUtil();
+init();
+
+function init() {
+  generateBlocks(Number(slider.value));
+
+  slider.addEventListener("input", generateBlockUtil);
 }
 
-function generateBlockUtil(){
+function generateBlockUtil() {
   container.innerHTML = '';
-  var result = document.querySelector("#result");
-  result.innerHTML = '';
+  resultContainer.innerHTML = '';
+  warningContainer.innerHTML = '';
 
-  document.getElementById("warning").innerHTML = '';
-  if(slider.value > 150){
-    let warning = document.getElementById("warning");
-    let res = document.createElement('h3');
-    res.innerHTML = 'Warning: Dataset size is very high. Quick sort recommended!';
-    warning.appendChild(res);
+  if (slider.value > 150) {
+    showWarning("Dataset size is very high. Quick sort recommended!");
   }
 
   generateBlocks(Number(slider.value));
 }
 
 function generateBlocks(num = 45) {
+  dataset = Array.from({ length: num - 1 }, (_, i) => i + 1);
+  shuffleArray(dataset);
 
-  x = [];
+  const fragment = document.createDocumentFragment();
 
-  for (let i = 1; i < num; i += 1){
-      x.push(i);
-    }
+  dataset.forEach((value, i) => {
+    const block = document.createElement("div");
+    block.classList.add("block");
+    block.setAttribute('block-value', value);
 
-    x.sort(() => Math.random() - 0.5); //shuffle array
-  
-    let fragment = document.createDocumentFragment()
+    const heightMultiplier = calculateHeightMultiplier(num);
+    setBlockStyles(block, value, num, i, heightMultiplier);
 
-    for (let i = 0; i < num-1; i += 1) {
-      
-      const value = x[i];
-      const block = document.createElement("div");
-      
-      block.classList.add("block");
-      
-      if(num < 100)
-        block.style.height = `${value * 3}px`;
-      else if(num >= 100 && num < 200)
-        block.style.height = `${value * 1.35}px`;
-      else if(num >= 200 && num < 300)
-        block.style.height = `${value * 0.9}px`;
-      else if(num >= 300 && num < 400)
-        block.style.height = `${value * 0.6}px`;
-      else if(num >= 400)
-        block.style.height = `${value * 0.5}px`;
+    fragment.append(block);
+  });
 
-      block.style.width = `${900/(num)}px`;
-      block.style.transform = `translateX(${i * 1200/(num)}px)`;
-  
-      const blockLabel = document.createElement("label");
-      blockLabel.classList.add("block__id");
-      
-      if(num > 50 && num < 80)
-        blockLabel.style.fontSize = `10px`;
-      if(num >= 80 && num < 120)
-        blockLabel.style.fontSize = `6px`;
-      if(num >= 120 && num < 200)
-        blockLabel.style.fontSize = `3px`;
-      if(num >= 200)
-        blockLabel.style.fontSize = `0px`;
+  container.append(fragment);
+}
 
-        blockLabel.innerHTML = value;
-  
-      block.appendChild(blockLabel);
-      fragment.append(block);
-    }
-    container.append(fragment);
-  }
+function calculateHeightMultiplier(num) {
+  if (num < 40) return 7;
+  else if (num < 100) return 3;
+  else if (num < 200) return 1.35;
+  else if (num < 300) return 0.9;
+  else if (num < 400) return 0.6;
+  else return 0.5;
+}
+
+function setBlockStyles(block, value, num, index, heightMultiplier) {
+  block.style.height = `${value * heightMultiplier}px`;
+  block.style.width = `${900 / num}px`;
+  block.style.left = `${index * (900 / num)}px`;
+  block.style.marginLeft = '0.5px';
+  block.style.marginRight = '0.5px';
+}
+
+function showWarning(message) {
+  const res = document.createElement('h3');
+  res.innerHTML = `Warning: ${message}`;
+  warningContainer.appendChild(res);
+}
