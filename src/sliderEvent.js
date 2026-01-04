@@ -9,8 +9,17 @@ init();
 
 function init() {
   generateBlocks(Number(slider.value));
+  slider.addEventListener("input", debounce(generateBlockUtil, 100));
+}
 
-  slider.addEventListener("input", generateBlockUtil);
+function debounce(func, delay) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
 }
 
 function generateBlockUtil() {
